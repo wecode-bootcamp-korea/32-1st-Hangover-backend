@@ -1,7 +1,6 @@
-from django.db import models
-
-from core.models import TimeStampedModel
-from users.models import User
+from django.db       import models
+from core.models     import TimeStampedModel
+from users.models    import User
 from products.models import Product
 
 class Review(TimeStampedModel):
