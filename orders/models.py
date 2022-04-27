@@ -11,12 +11,12 @@ class Order(TimeStampedModel):
     class Meta:
         db_table = 'orders'
 
-class OrderItems(TimeStampedModel):
-    order_id          = models.ForeignKey('Order', on_delete=models.CASCADE)
-    quantity          = models.IntegerField()
-    product_id        = models.ForeignKey(Product, on_delete=models.CASCADE)
+class OrderItem(TimeStampedModel):
+    order             = models.ForeignKey('Order', on_delete=models.CASCADE)
+    quantity          = models.PositiveIntegerField()
+    product           = models.ForeignKey(Product, on_delete=models.CASCADE)
     order_item_status = models.ForeignKey('OrderItemStatus', on_delete=models.CASCADE)
-    shipment_id       = models.ForeignKey('OrderShipment', on_delete=models.CASCADE, null=True)
+    shipment          = models.ForeignKey('OrderShipment', on_delete=models.CASCADE, null=True)
 
     class Meta:
         db_table = 'order_items'
