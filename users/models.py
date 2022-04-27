@@ -7,8 +7,8 @@ class User(TimeStampedModel):
     lastname  = models.CharField(max_length=50)
     email     = models.EmailField(max_length=50,unique=True)
     password  = models.CharField(max_length=200)
-    friends    = models.ManyToManyField('self', through='Friend', symmetrical=False)
-    carts      = models.ManyToManyField(Product, through='Cart')
+    friends   = models.ManyToManyField('self', through='Friend', symmetrical=False)
+    carts     = models.ManyToManyField(Product, through='Cart')
 
     class Meta:
         db_table ='users'
@@ -30,7 +30,7 @@ class Friend(TimeStampedModel):
 
         constraints = [
             models.UniqueConstraint(
-                fields=["friend_from", "friend_to"],
-                name="unique_follow",
+                fields = ["friend_from", "friend_to"],
+                name = "unique_follow",
             ),
         ]
