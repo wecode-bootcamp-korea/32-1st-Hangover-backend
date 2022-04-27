@@ -26,6 +26,13 @@ class ReviewLike(TimeStampedModel):
 
     class Meta:
         db_table = 'review_likes'
+        
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "review"],
+                name="unique_review",
+            ),
+        ]
 
 class Rating(TimeStampedModel):
     rating = models.DecimalField(max_digits=2, decimal_places=1)
