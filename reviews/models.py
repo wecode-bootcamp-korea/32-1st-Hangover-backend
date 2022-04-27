@@ -21,7 +21,7 @@ class Comment(TimeStampedModel):
         db_table = 'comments'
 
 class ReviewLike(TimeStampedModel):
-    review =  models.ForeignKey('Review', on_delete=models.CASCADE)
+    review = models.ForeignKey('Review', on_delete=models.CASCADE)
     user   = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
