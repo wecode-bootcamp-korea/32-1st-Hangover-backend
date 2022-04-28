@@ -7,7 +7,6 @@ class Product(TimeStampedModel):
     country            = models.ForeignKey('Country', on_delete=models.CASCADE)
     alcohol_percentage = models.DecimalField(max_digits=3, decimal_places=1)
     price              = models.DecimalField(max_digits=10, decimal_places=3)
-    content            = models.CharField(max_length=1000)
     food_category      = models.ManyToManyField('FoodPairing', through="ProductFoodPairing")
     property           = models.JSONField()
 
