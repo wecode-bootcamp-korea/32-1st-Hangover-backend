@@ -34,8 +34,8 @@ class ReviewLike(TimeStampedModel):
             ),
         ]
 
-class Rating(TimeStampedModel):
-    rating = models.DecimalField(max_digits=2, decimal_places=1)
+class Rating(models.Model):
+    score = models.DecimalField(max_digits=2, decimal_places=1)
 
     class Meta:
         db_table = 'ratings'
