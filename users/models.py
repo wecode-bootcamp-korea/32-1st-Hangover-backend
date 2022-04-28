@@ -26,11 +26,11 @@ class Friend(TimeStampedModel):
     friend_to   = models.ForeignKey('User', on_delete=models.CASCADE, related_name='friend_to')
 
     class Meta:
-        db_table ='friends'
+        db_table = 'friends'
 
         constraints = [
             models.UniqueConstraint(
                 fields = ["friend_from", "friend_to"],
-                name = "unique_follow",
+                name   = "unique_follow",
             ),
         ]

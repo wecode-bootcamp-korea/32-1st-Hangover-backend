@@ -2,7 +2,7 @@ from django.db   import models
 from core.models import TimeStampedModel
 
 class Product(TimeStampedModel):
-    product_name       = models.CharField(max_length=500)
+    name               = models.CharField(max_length=500)
     category           = models.ForeignKey('Category', on_delete=models.CASCADE)
     country            = models.ForeignKey('Country', on_delete=models.CASCADE)
     alcohol_percentage = models.DecimalField(max_digits=3, decimal_places=1)

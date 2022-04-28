@@ -21,19 +21,19 @@ class OrderItem(TimeStampedModel):
     class Meta:
         db_table = 'order_items'
 
-class OrderStatus(TimeStampedModel):
+class OrderStatus(models.Model):
     status = models.CharField(max_length=50)
 
     class Meta:
         db_table ='order_statuses'
 
-class OrderItemStatus(TimeStampedModel):
+class OrderItemStatus(models.Model):
     status = models.CharField(max_length=50)
 
     class Meta:
         db_table = 'order_item_statuses'
 
-class OrderShipment(TimeStampedModel):
+class OrderShipment(models.Model):
     tracking_number  = models.CharField(max_length=200)
     delivery_company = models.CharField(max_length=200)
 
