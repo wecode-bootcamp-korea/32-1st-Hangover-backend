@@ -1,13 +1,11 @@
-import json
-
-import bcrypt
+import json, bcrypt
 
 from django.core.exceptions import ValidationError
-from users.validation       import validate_email, existing_email, validate_password
-
 from django.http            import HttpResponse
 from django.views           import View
-from users.models           import User
+
+from users.validation import validate_email, existing_email, validate_password
+from users.models     import User
 
 class SignUpView(View):
     def post(self, request):
