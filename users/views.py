@@ -3,21 +3,21 @@ import json
 import bcrypt
 
 from django.core.exceptions import ValidationError
-from users.validation import validate_email, existing_email, validate_password
+from users.validation       import validate_email, existing_email, validate_password
 
-from django.http      import HttpResponse
-from django.views     import View
-from users.models     import User
+from django.http            import HttpResponse
+from django.views           import View
+from users.models           import User
 
 class SignUpView(View):
     def post(self, request):
         data = json.loads(request.body)
 
         try:
-            email = data['email']
+            email     = data['email']
             firstname = data['firstname']
-            lastname = data['lastname']
-            password = data['password']
+            lastname  = data['lastname']
+            password  = data['password']
 
             validate_email(email)
             existing_email(email)
@@ -27,10 +27,10 @@ class SignUpView(View):
             decoded_hashed_password = hashed_password.decode('utf-8')
 
             User.object.create(
-                email = email,
+                email     = email,
                 firstname = firstname,
-                lastname = lastname,
-                password = decoded_hashed_password,
+                lastname  = lastname,
+                password  = decoded_hashed_password,
             )
             return JsonResponse({"message": "SUCCESS"}, status=201)
 
