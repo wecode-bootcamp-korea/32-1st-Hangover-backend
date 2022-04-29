@@ -21,6 +21,7 @@ class Cart(TimeStampedModel):
     class Meta:
         db_table ='carts'
 
+
 class Friend(TimeStampedModel):
     friend_from = models.ForeignKey('User', on_delete=models.CASCADE, related_name='friend_from')
     friend_to   = models.ForeignKey('User', on_delete=models.CASCADE, related_name='friend_to')
