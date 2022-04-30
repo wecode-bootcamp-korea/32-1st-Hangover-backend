@@ -1,5 +1,6 @@
 from django.views     import View
 from django.http      import JsonResponse
+from django.db.models import Avg
 
 from products.models  import Product
 from reviews.models   import Review
@@ -14,6 +15,13 @@ class ProductDetailView(View):
                 foods_list.append(
                     food.foodpairing.food_category
                     )
+            average_rating = Product.objects.get(id=product_id)._Review.all()
+            average_rating_list = []
+            for average in average_rating:
+                average_rating_list.append(
+                    float(average.rating.score)
+                )
+            print(average_rating_list)
 
             product_detail = {
                 'name'               : product.name,
@@ -22,9 +30,9 @@ class ProductDetailView(View):
                 'alcohol_percentage' : product.alcohol_percentage,
                 'food_category'      : foods_list,
                 'property'           : product.property,
-                'reviews'            : Review.objects.filter(product_id=product_id).count()
+                'reviews'            : Review.objects.filter(product_id=product_id).count(),
+                'ave_rating' : sum(average_rating_list)/len(average_rating_list)
             }
-
             return JsonResponse({'product_detail' : product_detail}, status = 200)
 
         except Product.DoesNotExist:
