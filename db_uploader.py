@@ -46,7 +46,7 @@ with open(CSV_PATH_PRODUCTS) as in_file:
         if Country.objects.filter(pk=row[0]).exists():
             pass
         else:
-            Country.objects.create(pk=row[0],country=row[1])
+            Country.objects.create(pk=row[0],origin=row[1])
 
 CSV_PATH_PRODUCTS='./db_csv/products_FoodPairing_i.csv'
 with open(CSV_PATH_PRODUCTS) as in_file:
@@ -148,6 +148,15 @@ with open(CSV_PATH_PRODUCTS) as in_file:
         else:
             Review.objects.create(pk=row[0],user_id=row[1],product_id=row[2],rating_id=row[3], content = row[4])
 
+CSV_PATH_PRODUCTS='./db_csv/reviews_Comment_dd.csv'
+with open(CSV_PATH_PRODUCTS) as in_file:
+    data_reader = csv.reader(in_file)
+    next(data_reader,None)
+    for row in data_reader:
+        if Comment.objects.filter(pk=row[0]).exists():
+            pass
+        else:
+            Comment.objects.create(pk=row[0],review_id=row[1],user_id=row[2],content=row[3])
 
 CSV_PATH_PRODUCTS='./db_csv/reviews_ReviewLike_dd.csv'
 with open(CSV_PATH_PRODUCTS) as in_file:
