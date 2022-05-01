@@ -4,10 +4,7 @@ import bcrypt, jwt
 from django.http            import JsonResponse
 from django.views           import View
 from django.core.exceptions import ValidationError
-from django.http            import HttpResponse
-from django.views           import View
 
-from users.models           import User
 from my_settings            import ALGORITHM, SECRET_KEY
 from datetime               import datetime, timedelta
 
@@ -47,12 +44,12 @@ class SignUpView(View):
 
 class SignInView(View):
     def post(self, request):
-        data = json.loads(request.body)
-
+        
         try:
-            email          = data['email']
-            user           = User.objects.get(email=email)
-            password       = data['password']
+            data     = json.loads(request.body)
+            email    = data['email']
+            user     = User.objects.get(email=email)
+            password = data['password']
 
             if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
 
@@ -62,7 +59,7 @@ class SignInView(View):
                 }
                 jwt_access_token = jwt.encode(payload, SECRET_KEY, ALGORITHM)
 
-                return JsonResponse({'messasge':'SUCCESS','JWT_TOKEN':jwt_access_token}, status=200)
+                return JsonResponse({'message':'SUCCESS','JWT_TOKEN':jwt_access_token}, status=200)
             return JsonResponse({"message":"INVALID_USER"},status=401)
 
         except KeyError:
