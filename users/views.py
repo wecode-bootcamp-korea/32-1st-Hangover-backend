@@ -28,7 +28,7 @@ class SignUpView(View):
             hashed_password         = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
             decoded_hashed_password = hashed_password.decode('utf-8')
 
-            User.object.create(
+            User.objects.create(
                 email     = email,
                 firstname = firstname,
                 lastname  = lastname,
@@ -51,7 +51,7 @@ class SignInView(View):
             user     = User.objects.get(email=email)
             password = data['password']
 
-            if not bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
+            if bcrypt.checkpw(password.encode('utf-8'), user.password.encode('utf-8')):
 
                 payload = {
                     'id'  : user.id,

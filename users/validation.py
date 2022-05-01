@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from users.models           import User
 
 REGEX_EMAIL    = '^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-REGEX_PASSWORD = '^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{10,}$'
+REGEX_PASSWORD = '(?=.*[a-zA-Z])((?=.*\d)(?=.*\W)).{10,}'
 
 def validate_email(email):
     if not re.match(REGEX_EMAIL, email):
