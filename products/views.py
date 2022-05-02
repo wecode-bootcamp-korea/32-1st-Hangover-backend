@@ -1,12 +1,11 @@
 from products.models  import Product, ImageUrl, Category, Country, FoodPairing ,ProductFoodPairing
 from django.db.models import Avg, Count,Q,F
 
-from django.http            import JsonResponse
-from django.views           import View
+from django.http      import JsonResponse
+from django.views     import View
 
 import random
 
-# Create your views here.
 class ProductListView(View):
     def get(self,request):
 
@@ -20,42 +19,40 @@ class ProductListView(View):
             sorting  = ['-avg_rating','-price'] if sorting == '-avg_rating' else [sorting,'-avg_rating']
 
 
+
         #FIXME : SEARCH부분을 아래의 필드명 변경과 일관되도록 수정해야 함
+        
         products_list = Product.objects.all().annotate(
-            avg_rating=Avg('_Review__rating__score'),
-            alcohol_type=F('category_id__name'),
-            origin_country=F('country_id__origin'),
-            image_url=F('imageurl__image_url'),
-            # pairing_food=F('imageurl__image_url'),#FIXME:고쳐야됨.. 어떻게?
-            review_counts=Count('_Review')).order_by(*sorting)#언팩킹임. 되게 유용한 방식임 꼭기억!!!!!!!!!!!
+            avg_rating            = Avg('_Review__rating__score'),
+            alcohol_type          = F('category_id__name'),
+            origin_country        = F('country_id__origin'),
+            image_url             = F('imageurl__image_url'),
+            pairing_food_category = F('productfoodpairing__foodpairing__food_category'),
+                #테이블접근(테이블명의 소문자!or related_name) > 접근한 테이블의 필드명(그리고 이 필드가 foreignkey임) > 그 필드가 클래스라고 생각하고 그 필드의 필드명 
+            review_counts         = Count('_Review')).order_by(*sorting)#언팩킹임. 되게 유용한 방식임 꼭기억!!!!!!!!!!!
 
         if search:
-            #분기를 이렇게 만드는 수 밖에 없나? Q객체를 쓸 수는 없을까? search를 따로 떨어뜨려서 사용할 거라면 차라리 searchview를 만드는 게 낫지 않나?? 중복되는 기능 자체가 없는데?
-            #더 좋은 방법이 있을까???? values_list를 쓰자 > 썻음
             if search in Category.objects.all().values_list('name',flat = True):
-                products_list = products_list.filter(category__name=search)
+                products_list = products_list.filter(alcohol_type=search)
                 filter = 'Category'
 
             if search in Country.objects.all().values_list('origin',flat = True):
-                products_list = products_list.filter(country__origin=search)
+                products_list = products_list.filter(origin_country=search)
                 filter = 'Country'
 
             if search in FoodPairing.objects.all().values_list('food_category',flat = True):
-                products_list = products_list.filter(productfoodpairing__foodpairing__food_category=search)
+                products_list = products_list.filter(pairing_food_category=search)
                 filter = 'Foodpairing'
-                #테이블접근(테이블명의 소문자!) > 접근한 테이블의 필드명(그리고 이 필드가 foreignkey임) > 그 필드가 클래스라고 생각하고 그 필드의 필드명 
-                #더 좋은 방법이 있을 거야 > related , prelatefetch?
             else:
                 products_list = products_list.filter(name__icontains=search)
             
-            #search에 잡히는 단어가 없을 경우? > 상품이없다는 메세지 +카테고리들 사이에서 랜덤으로 고른 추천검색어를 같이 줌
             if not products_list:
                 message = "no_searched_products"
                 recommended_words = {
-                    "Category":random.choice(Category.objects.all().values_list('name',flat = True)),
-                    "Country":random.choice(Country.objects.all().values_list('origin',flat = True)),
-                    "Foodpairing":random.choice(FoodPairing.objects.all().values_list('food_category',flat = True))}
-
+                    "Category"    : random.choice(Category.objects.all().values_list('name',flat = True)),
+                    "Country"     : random.choice(Country.objects.all().values_list('origin',flat = True)),
+                    "Foodpairing" : random.choice(FoodPairing.objects.all().values_list('food_category',flat = True))
+                    }
                 return JsonResponse({"message":message,"recommended_words":recommended_words}, status=200)
 
         #search가 아닐 경우
@@ -65,25 +62,25 @@ class ProductListView(View):
             #get으로하면, category키로 여러개가 들어올 경우 마지막 것만 들어옴
             category     = request.GET.getlist('category')
             country      = request.GET.getlist('country')
-            price        = request.GET.get('price',[0,1000000])
-            rating       = request.GET.get('rating',0)
+            price        = int(request.GET.get('price',1000000))
+            rating       = int(request.GET.get('rating',0))
             food_pairing = request.GET.getlist('food_pairing')
 
 
-            # return JsonResponse({"test":"hi"}, status=200)
-            q = Q() #모든 filter
+
+            q = Q() 
             if category:
-                q &= Q(alcohol_type__in = category)
+                q &= Q(alcohol_type__in=category)
             if country:
-                q &= Q(origin_country__in = country)
+                q &= Q(origin_country__in=country)
             if price:
-                q &= Q(price__lte=int(price))
+                q &= Q(price__lte=price)
             if rating:
-                q &= Q(avg_rating__gte=float(rating))
-            #FIXME : foodpairing 추가해야 함
+                q &= Q(avg_rating__gte=rating)
+            if food_pairing:
+                q &= Q(pairing_food_category=food_pairing)
 
             products_list = products_list.filter(q)
-
 
 
         #return 영역
