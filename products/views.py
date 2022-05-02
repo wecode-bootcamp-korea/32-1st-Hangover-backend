@@ -1,37 +1,34 @@
-from django.views     import View
-from django.http      import JsonResponse
+from django.views import View
+from django.http  import JsonResponse
+from django.db.models import Avg
 
-from products.models  import Product
-from reviews.models   import Review
+from products.models import Product
+
+"""
+목적: 상품의 상세 정보를 데이터베이스에서 가져오는 api
+
+필요한 정보: 제품의 고유번호
+
+보내줘야 하는 정보: 이름, 가격, 원산지, 도수, 푸드 페어링, 특성, 리뷰 수, 평점
+"""
 
 class ProductDetailView(View):
     def get(self, request, product_id):
         try:
-            product    = Product.objects.get(id=product_id)
 
-            food_list         = product.productfoodpairing_set.all()
-            food_pairing_list = []
-            for food in food_list:
-                food_pairing_list.append(
-                    food.foodpairing.food_category
-                    )
-
-            average_rating      = product._Review.all()
-            average_rating_list = []
-            for average in average_rating:
-                average_rating_list.append(
-                    float(average.rating.score)
-                )
+            product = Product.objects\
+                .annotate(avg_rating = Avg('reviews__rating__score'))\
+                .get(id=product_id)
 
             product_detail = {
                 'name'               : product.name,
                 'price'              : product.price,
                 'country'            : product.country.origin,
                 'alcohol_percentage' : product.alcohol_percentage,
-                'food_category'      : food_pairing_list,
+                'food_category'      : [food.food_category for food in product.food_category.all()],
                 'property'           : product.property,
-                'reviews'            : Review.objects.filter(product_id=product_id).count(),
-                'ave_rating'         : sum(average_rating_list)/len(average_rating_list)
+                'reviews'            : product.reviews.all().count(),
+                'ave_rating'         : product.avg_rating
             }
             return JsonResponse({'product_detail' : product_detail}, status = 200)
 

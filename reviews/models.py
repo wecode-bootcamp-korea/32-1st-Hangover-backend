@@ -5,7 +5,7 @@ from products.models import Product
 
 class Review(TimeStampedModel):
     user    = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE,related_name='_Review')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,related_name='reviews')
     rating  = models.ForeignKey('Rating', on_delete=models.CASCADE)
     content = models.TextField(null=True)
 
