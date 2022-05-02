@@ -1,5 +1,5 @@
-from django.views import View
-from django.http  import JsonResponse
+from django.views     import View
+from django.http      import JsonResponse
 from django.db.models import Avg
 
 from products.models import Product
