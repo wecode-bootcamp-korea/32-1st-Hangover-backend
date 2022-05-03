@@ -32,21 +32,24 @@ Our product list was expanded to include various liquor categories including win
 
 ## 🍻 적용 기술 및 구현 기능
 
+구현 기능
 - 회원가입, 로그인 API - Jwt 인증 포함
 - 상품 필터
 - 상품 검색
 - 리뷰 CRUD
 - 장바구니 CRUD
 
+Implemented Features
 - Registration API (Signup, Signin) - Jwt Authorization
 - Product Filters
 - Product Search
 - Product Reviews CRUD
 - Product Cart CRUD
 
-
 ### 적용기술
 
 > Front: React, React Router, SCSS
+
 > Back: Python,Django, AWS, MySQL
+
 > Team Tools: Git, Trello, Slack
