@@ -52,11 +52,6 @@ class ProductSearchView(View):
                 "Foodpairing" : random.choice(FoodPairing.objects.all().values_list('food_category', flat = True))
                 }
             return JsonResponse({"message":message,"recommended_words":recommended_words}, status=200)
-from django.views     import View
-from django.http      import JsonResponse
-from django.db.models import Avg
-
-from products.models import Product
 
 class ProductDetailView(View):
     def get(self, request, product_id):
