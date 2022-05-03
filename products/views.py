@@ -47,8 +47,8 @@ class ProductSearchView(View):
         else:
             message = "no_searched_products"
             recommended_words = {
-                "Category"    : random.choice(Category.objects.all().values_list('name',flat = True)),
-                "Country"     : random.choice(Country.objects.all().values_list('origin',flat = True)),
-                "Foodpairing" : random.choice(FoodPairing.objects.all().values_list('food_category',flat = True))
+                "Category"    : random.choice(Category.objects.all().values_list('name', flat = True)),
+                "Country"     : random.choice(Country.objects.all().values_list('origin', flat = True)),
+                "Foodpairing" : random.choice(FoodPairing.objects.all().values_list('food_category', flat = True))
                 }
             return JsonResponse({"message":message,"recommended_words":recommended_words}, status=200)
