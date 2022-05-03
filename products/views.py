@@ -4,14 +4,6 @@ from django.db.models import Avg
 
 from products.models import Product
 
-"""
-목적: 상품의 상세 정보를 데이터베이스에서 가져오는 api
-
-필요한 정보: 제품의 고유번호
-
-보내줘야 하는 정보: 이름, 가격, 원산지, 도수, 푸드 페어링, 특성, 리뷰 수, 평점
-"""
-
 class ProductDetailView(View):
     def get(self, request, product_id):
         try:
