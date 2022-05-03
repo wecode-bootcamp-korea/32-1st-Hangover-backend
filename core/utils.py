@@ -18,10 +18,10 @@ def login_decorator(func):
             request.user     = login_user
 
         except jwt.exceptions.DecodeError:
-            return JsonResponse({"message": "INVALID_TOKEN"}, status=400)
+            return JsonResponse({"message": "INVALID_TOKEN"}, status=401)
 
-        except User.DoesNotExist:
-            return JsonResponse({"message": "THIS_ACCOUNT_DOES_NOT_EXIST"}, status=400)
+        except jwt.ExpiredSignatureError :
+            return JsonResponse({'message':"EXPIRED_TOKEN"}, status=401)
 
         return func(self, request, *args, **kwargs)
     return wrapper
