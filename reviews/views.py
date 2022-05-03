@@ -4,7 +4,7 @@ from django.views    import View
 from django.http     import JsonResponse
 
 from core.utils     import login_decorator
-from reviews.models  import Review
+from reviews.models import Review
 class ReviewView(View):
     @login_decorator
     def post(self, request):
