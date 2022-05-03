@@ -41,8 +41,7 @@ class ProductSearchView(View):
                 'created_at'   :product.created_at,
                 'rating'       :product.avg_rating, 
             } for product in products_list][:limit]
-
-            return JsonResponse({"filter":filter,"result":result}, status=200)
+            return JsonResponse({"result":[result,filter]}, status=200)
 
         else:
             message = "no_searched_products"
@@ -51,7 +50,8 @@ class ProductSearchView(View):
                 "Country"     : random.choice(Country.objects.all().values_list('origin', flat = True)),
                 "Foodpairing" : random.choice(FoodPairing.objects.all().values_list('food_category', flat = True))
                 }
-            return JsonResponse({"message":message,"recommended_words":recommended_words}, status=200)
+            return JsonResponse({"result":[message,recommended_words]}, status=200)
+
 
 class ProductDetailView(View):
     def get(self, request, product_id):
