@@ -12,7 +12,7 @@ class ProductSearchView(View):
         search = request.GET.get('search')
         limit  = int(request.GET.get('limit',10))
 
-        products_list = Product.objects.all().annotate(avg_rating= Avg('_Review__rating__score')).order_by('-avg_rating')
+        products_list = Product.objects.all().annotate(avg_rating= Avg('reviews__rating__score')).order_by('-avg_rating')
 
         if search in Category.objects.all().values_list('name',flat = True):
             products_list = products_list.filter(category_id__name=search)
@@ -40,7 +40,7 @@ class ProductSearchView(View):
                 'image_url'    :product.imageurl_set.first().image_url,
                 'created_at'   :product.created_at,
                 'rating'       :product.avg_rating, 
-            } for product in products_list]    
+            } for product in products_list][:limit]
 
             return JsonResponse({"filter":filter,"result":result}, status=200)
 
