@@ -12,9 +12,7 @@ class ProductSearchView(View):
         search = request.GET.get('search')
         limit  = int(request.GET.get('limit',10))
 
-        products_list = Product.objects.all().annotate(
-            avg_rating            = Avg('_Review__rating__score'),
-        )
+        products_list = Product.objects.all().annotate(avg_rating= Avg('_Review__rating__score')).order_by('-avg_rating')
 
         if search in Category.objects.all().values_list('name',flat = True):
             products_list = products_list.filter(category_id__name=search)
