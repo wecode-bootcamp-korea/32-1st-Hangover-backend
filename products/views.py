@@ -7,11 +7,31 @@ from django.views     import View
 from products.models  import Product, Category, Country, FoodPairing
 
 class ProductSearchView(View):
+
+    """
+    상황1. 키워드가 존재 할 때
+    - 존재한 상품
+    상황2. 키워드가 전혀 일치하지 않을 때
+    - 
+           result = {
+            "Category" : [
+                {},{},{}
+            ],
+            "Country" : [
+                {},{},{}
+            ],
+            "Foodpairing" : [
+                {},{},{}
+            ]
+        }
+   
+    """
+
     def get(self,request):
 
         search = request.GET.get('search')
         limit  = int(request.GET.get('limit',10))
-
+        
         keyword_list = {
             "Category"    : Category.objects.all().values_list('name',flat = True),
             "Country"     : Country.objects.all().values_list('origin',flat = True),
@@ -27,9 +47,9 @@ class ProductSearchView(View):
 
         if filter in globals():
             Q_filter = {
-                'Category'        : Q(category_id__name=matched_keyword),
-                'Country'         : Q(country_id__origin=matched_keyword),
-                'Foodpairing'     : Q(productfoodpairing__foodpairing__food_category=matched_keyword),
+                'Category'    : Q(category_id__name=matched_keyword),
+                'Country'     : Q(country_id__origin=matched_keyword),
+                'Foodpairing' : Q(productfoodpairing__foodpairing__food_category=matched_keyword),
             }
             products_list = products_list.filter(Q_filter[filter])
         else:
@@ -53,7 +73,7 @@ class ProductSearchView(View):
         else:
             message = "no_searched_products"
             recommended_words = {
-                "Category"    : random.choice(Category.objects.all().values_list('name', flat = True)),
+                "Category"    : Category.objects.all().values_list('name', flat=True).order_by('?').first(),
                 "Country"     : random.choice(Country.objects.all().values_list('origin', flat = True)),
                 "Foodpairing" : random.choice(FoodPairing.objects.all().values_list('food_category', flat = True))
                 }
