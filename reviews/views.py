@@ -15,9 +15,7 @@ class ReviewView(View):
 
             review_id = data['review_id']
 
-            review = Review.objects.get(
-                id = review_id
-                )
+            review = Review.objects.get(id = review_id)
 
             if review.user != request.user:
                 return JsonResponse({'message': 'INVALID_USER'}, status=401)
