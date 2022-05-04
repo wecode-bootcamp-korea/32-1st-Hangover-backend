@@ -14,8 +14,8 @@ class ReviewView(View):
 
             review = Review.objects.get(id = review_id)
 
-            if not request.user.id == review.user.id:
-                return JsonResponse({"message": "FORBIDDEN"}, status = 403)
+            if request.user.id != review.user.id:
+                return JsonResponse({'message': 'INVALID_USER'}, status=401)
                 
             review.delete()
             return JsonResponse({"message": "Review was deleted"}, status = 204)
