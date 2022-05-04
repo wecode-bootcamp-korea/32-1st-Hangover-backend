@@ -32,9 +32,9 @@ class ProductListView(View):
             }
             sorting = sorting_dict.get(sorting)
             
-            products_list = Product.objects.all().annotate(
-                    avg_rating            = Avg('reviews__rating__score'),
-                    review_counts         = Count('reviews'))
+            products_list = Product.objects\
+            .annotate(avg_rating    =Avg('reviews__rating__score'))\
+            .annotate(review_counts =Count('reviews'))
                     #언팩킹임. 되게 유용한 방식임 꼭기억!!!!!!!!!!!
 
 
@@ -45,7 +45,6 @@ class ProductListView(View):
                     pk=random.randint(1,max_id)
                     if pk not in picked_product_id_list and Product.objects.all().filter(id=pk).exists():
                         picked_product_id_list.append(pk)
-                        # print(picked_product_id_list)
                 products_list=products_list.filter(id__in=picked_product_id_list)
                 sorting = '-avg_rating'
                 
@@ -64,22 +63,19 @@ class ProductListView(View):
 
                 products_list = products_list.filter(q)
 
-
-            sorting = ['-avg_rating','-price'] if sorting == "-avg_rating" else [sorting,'-avg_rating']
+            sorting = ['-avg_rating','-price'] if sorting[-6:] == "rating" else [sorting,'-avg_rating']
             products_list = products_list.order_by(*sorting)
 
             ####return####
             result = []
-            for product in products_list:
-                if product.reviews.all():
-                    reviewlike_dict = {}
-                    for review in Review.objects.filter(product_id=product.id):
-                        reviewlike_dict[review.id] = review.reviewlike_set.count()
+            for product in products_list[(page-1)*limit:page*limit]:
+                review = None
+                if product.reviews.exists:
+                    reviewlike_dict = {
+                        review.id:review.reviewlike_set.count() for review in Review.objects.filter(product_id=product.id)
+                    }
                     likemost_review_id = max(reviewlike_dict,key=reviewlike_dict.get)
-
                     review = Review.objects.get(id=likemost_review_id)
-                else:
-                    review = None
 
                 result.append({
                 'id'           :product.id,
@@ -95,15 +91,9 @@ class ProductListView(View):
                     'username'   :review.user.firstname + review.user.lastname,
                     'created_at' :review.content,
                     'rating'     :review.rating.score
-                } if not review == None else None
+                } if not review else None
             })
-
-            #FIXME: 쿼리개수가 12개 미만일때 에러가 발생함
-            all_page,_ = divmod(len(products_list),limit)
-            result = result[page*limit-1:] if page == all_page else result[(page-1)*limit:page*limit]
-
-            return JsonResponse({"current_page":page,"all_page":all_page,"result":result}, status=200)
-
+            return JsonResponse({"result":result}, status=200)
         except KeyError:
             return JsonResponse({"message":"KEY_ERROR"}, status=400)
 
