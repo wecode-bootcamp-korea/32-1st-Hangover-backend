@@ -9,10 +9,7 @@ from reviews.models import Review
 class ReviewView(View):
     def get(self, request):
         try:
-            data = json.loads(request.body)
-
-            product_id = data['product_id']
-            
+            product_id = request.GET.get('product_id')
             reviews = Review.objects.filter(id=product_id).all()
 
             review_list = [{
