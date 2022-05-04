@@ -10,21 +10,26 @@ class ReviewView(View):
 
     @login_decorator
     def post(self, request):
-        data       = json.loads(request.body)
+        
+        try:
+            data       = json.loads(request.body)
 
-        user       = request.user
-        product_id = data.get('product_id')
-        content    = data.get('content')
-        rating     = data.get('rating')
+            user       = request.user
+            product_id    = data['product_id']
+            content    = data['content']
+            rating     = data['rating']
 
-        if not (rating or content):
-            return JsonResponse({'message': 'KEY_ERROR'}, status=400)
+            if not (rating or content):
+                return JsonResponse({'message': 'KEY_ERROR'}, status=400)
 
-        review = Review.objects.create(
-            user       = user,
-            product_id = product_id,
-            rating_id  = rating,
-            content    = content
-        )
+            review = Review.objects.create(
+                user       = user,
+                product_id = product_id,
+                rating_id  = rating,
+                content    = content
+            )
 
-        return JsonResponse({'message': 'SUCCESS'}, status=201)
+            return JsonResponse({'message': 'SUCCESS'}, status=201)
+
+        except KeyError:
+            return JsonResponse({"message": "KEY_ERROR"}, status=400)
