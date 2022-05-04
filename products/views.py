@@ -20,13 +20,6 @@ class ProductListView(View):
             rating       = int(request.GET.get('rating',0))
             food_pairing = request.GET.getlist('food_pairing')
             sorting      = request.GET.get('sorting','high_rating')
-            
-            print("category: ",category)
-            print("country: ",country)
-            print("price: ",price)
-            print("rating: ",rating)
-            print("food_pairing: ",food_pairing)
-            print("sorting: ",sorting)
 
             sorting_dict = {
                 "high_price"    : "-price", #높은 가격부터(내림차순)
@@ -37,7 +30,6 @@ class ProductListView(View):
                 "little_review" : "review_counts",
                 "random"        : "random", #랜덤방식추출(무작위 추출)
             }
-
             sorting = sorting_dict.get(sorting)
             
             products_list = Product.objects.all().annotate(
@@ -46,16 +38,16 @@ class ProductListView(View):
 
 
             if sorting == "random":
-
-                max_id = Product.objects.all().aggregate(max_id = Max('id'))['max_id']
+                max_id = products_list.aggregate(max_id = Max('id'))['max_id']
                 picked_product_id_list = []
                 while len(picked_product_id_list) < 12:
                     pk=random.randint(1,max_id)
                     if pk not in picked_product_id_list and Product.objects.all().filter(id=pk).exists():
                         picked_product_id_list.append(pk)
-                        print(picked_product_id_list)
-                products_list=Product.objects.filter(id__in=picked_product_id_list)
-
+                        # print(picked_product_id_list)
+                products_list=products_list.filter(id__in=picked_product_id_list)
+                sorting = '-avg_rating'
+                
             else:
                 q = Q() 
                 if category:
@@ -70,16 +62,16 @@ class ProductListView(View):
                     q &= Q(productfoodpairing__foodpairing__food_category=food_pairing)
 
                 products_list = products_list.filter(q)
-            
+
+
             sorting = ['-avg_rating','-price'] if sorting == "-avg_rating" else [sorting,'-avg_rating']
-                        
             products_list = products_list.order_by(*sorting)
 
             ####return####
             result = []
             for product in products_list:
                 if product.reviews.all():
-                    reviewlike_dict ={}
+                    reviewlike_dict = {}
                     for review in Review.objects.filter(product_id=product.id):
                         reviewlike_dict[review.id] = review.reviewlike_set.count()
                     likemost_review_id = max(reviewlike_dict,key=reviewlike_dict.get)
@@ -88,17 +80,13 @@ class ProductListView(View):
                 else:
                     review = None
 
-
-                # if product._Review.all(): #product의 Review가 있다면
-                #     review = product._Review.annotate(review_likecount=Count('reviewlike')).filter(review_likecount=max(Review.objects.annotate(review_likecount=Count('reviewlike')).filter(product_id=product.id).values_list('review _likecount',flat=True))).first()
-
                 result.append({
                 'id'           :product.id,
                 'price'        :product.price,
                 'name'         :product.name,
                 'country'      :product.country.origin,
                 'category'     :product.category.name,
-                'image_url'    :product.imageurl_set.first(),
+                'image_url'    :product.imageurl_set.first().image_url,
                 'created_at'   :product.created_at,
                 'rating'       :product.avg_rating, 
                 'review'       :{
@@ -108,10 +96,14 @@ class ProductListView(View):
                     'rating'     :review.rating.score
                 } if not review == None else None
             })
-
+            
+            print("result :",result)
             all_page,_ = divmod(len(products_list),limit)
             result = result[page*limit-1:] if page == all_page else result[(page-1)*limit:page*limit]
+            #여기서 에러발생
+            print("result :",result)
             
+
             return JsonResponse({"current_page":page,"all_page":all_page,"result":result}, status=200)
 
         except KeyError:
