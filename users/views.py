@@ -1,15 +1,18 @@
-import json
 import bcrypt, jwt
+import json
+from json.decoder           import JSONDecodeError
 
 from django.http            import JsonResponse
-from django.views           import View
 from django.core.exceptions import ValidationError
+from django.views           import View
 
 from my_settings            import ALGORITHM, SECRET_KEY
 from datetime               import datetime, timedelta
 
+from core.utils             import login_decorator
 from users.validation       import validate_email, existing_email, validate_password
-from users.models           import User
+from users.models           import User, Cart
+from products.models        import Product
 
 class SignUpView(View):
     def post(self, request):
@@ -66,3 +69,21 @@ class SignInView(View):
             return JsonResponse({"message":"KEY_ERROR"},status=400)
         except User.DoesNotExist:
             return JsonResponse({"message":"INVALID_USER"},status=401)
+class CartView(View):
+    @login_decorator
+    def get(self, request):
+        user = request.user
+        
+        if not Cart.objects.filter(user=user).exists():
+            return JsonResponse({'message': 'CART_DOES_NOT_EXIST'}, status=400)
+        
+        carts = Cart.objects.filter(user=user)
+        products_in_cart = [{
+            'cart_id' : cart.id,
+            'name'    : cart.product.name,
+            'count'   : cart.count,
+            'price'   : cart.product.price,
+            'image'   : cart.product.imageurl_set.first().image_url
+        } for cart in carts]
+
+        return JsonResponse({'results': products_in_cart}, status=200)
