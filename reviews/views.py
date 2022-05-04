@@ -25,4 +25,19 @@ class ReviewView(View):
             content    = content
         )
 
-        return JsonResponse({'message': 'SUCCESS'}, status=200)
+        return JsonResponse({'message': 'SUCCESS'}, status=201)
+
+    def get(self, request):
+        product_id = request.GET.get('product_id')
+
+        review_list = [{
+            "firstname"  : review.user.firstname,
+            "lastname"   : review.user.lastname,
+            "user_id"    : review.user.id,
+            "content"    : review.content,
+            "rating"     : review.rating.score,
+            "created_at" : review.created_at,
+            "review_id"  : review.id
+        } for review in Review.objects.filter(id=product_id).all()]
+        
+        return JsonResponse({'Reviews':review_list}, status=200)
