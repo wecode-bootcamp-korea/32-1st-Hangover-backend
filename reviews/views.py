@@ -13,7 +13,7 @@ class ReviewView(View):
         data       = json.loads(request.body)
 
         user       = request.user
-        product_id = request.GET.get('product_id')
+        product_id = data.get('product_id')
         content    = data.get('content')
         rating     = data.get('rating')
 
