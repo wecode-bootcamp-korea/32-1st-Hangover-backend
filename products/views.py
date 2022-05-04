@@ -34,7 +34,8 @@ class ProductListView(View):
             
             products_list = Product.objects.all().annotate(
                     avg_rating            = Avg('reviews__rating__score'),
-                    review_counts         = Count('reviews'))#언팩킹임. 되게 유용한 방식임 꼭기억!!!!!!!!!!!
+                    review_counts         = Count('reviews'))
+                    #언팩킹임. 되게 유용한 방식임 꼭기억!!!!!!!!!!!
 
 
             if sorting == "random":
