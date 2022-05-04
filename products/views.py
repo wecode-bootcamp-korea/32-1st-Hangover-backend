@@ -22,28 +22,26 @@ class ProductListView(View):
             sorting      = request.GET.get('sorting','high_rating')
 
             sorting_dict = {
-                "high_price"    : "-price", #높은 가격부터(내림차순)
+                "high_price"    : "-price",
                 "low_price"     : "price", 
-                "high_rating"   : "-avg_rating", #높은 점수부터(내림차순)
+                "high_rating"   : "-avg_rating",
                 "low_rating"    : "avg_rating",
-                "many_review"   : "-review_counts", #리뷰가 많은 것 부터
+                "many_review"   : "-review_counts",
                 "little_review" : "review_counts",
-                "random"        : "random", #랜덤방식추출(무작위 추출)
+                "random"        : "random",
             }
             sorting = sorting_dict.get(sorting)
             
             products_list = Product.objects\
-            .annotate(avg_rating    =Avg('reviews__rating__score'))\
-            .annotate(review_counts =Count('reviews'))
-                    #언팩킹임. 되게 유용한 방식임 꼭기억!!!!!!!!!!!
-
+            .annotate(avg_rating    = Avg('reviews__rating__score'))\
+            .annotate(review_counts = Count('reviews'))
 
             if sorting == "random":
                 max_id = products_list.aggregate(max_id = Max('id'))['max_id']
                 picked_product_id_list = []
                 while len(picked_product_id_list) < 12:
                     pk=random.randint(1,max_id)
-                    if pk not in picked_product_id_list and Product.objects.all().filter(id=pk).exists():
+                    if pk not in picked_product_id_list and Product.objects.filter(id=pk).exists():
                         picked_product_id_list.append(pk)
                 products_list=products_list.filter(id__in=picked_product_id_list)
                 sorting = '-avg_rating'
@@ -51,22 +49,24 @@ class ProductListView(View):
             else:
                 q = Q() 
                 if category:
-                    q &= Q(category_id__name=category)
+                    print(category)
+                    q &= Q(category_id__name__in=category)
+                    print(q)
                 if country:
-                    q &= Q(country_id__origin=country)
+                    q &= Q(country_id__origin__in=country)
                 if price:
                     q &= Q(price__lte=price)
                 if rating:
                     q &= Q(avg_rating__gte=rating)
                 if food_pairing:
-                    q &= Q(productfoodpairing__foodpairing__food_category=food_pairing)
+                    q &= Q(productfoodpairing__foodpairing__food_category__in=food_pairing)
 
                 products_list = products_list.filter(q)
 
             sorting = ['-avg_rating','-price'] if sorting[-6:] == "rating" else [sorting,'-avg_rating']
             products_list = products_list.order_by(*sorting)
-
-            ####return####
+            
+            
             result = []
             for product in products_list[(page-1)*limit:page*limit]:
                 review = None
@@ -75,8 +75,16 @@ class ProductListView(View):
                         review.id:review.reviewlike_set.count() for review in Review.objects.filter(product_id=product.id)
                     }
                     likemost_review_id = max(reviewlike_dict,key=reviewlike_dict.get)
+
                     review = Review.objects.get(id=likemost_review_id)
 
+                    review = {
+                    'id'         :review.user.id,
+                    'username'   :review.user.firstname + review.user.lastname,
+                    'created_at' :review.content,
+                    'rating'     :review.rating.score
+                }
+                
                 result.append({
                 'id'           :product.id,
                 'price'        :product.price,
@@ -86,12 +94,7 @@ class ProductListView(View):
                 'image_url'    :product.imageurl_set.first().image_url,
                 'created_at'   :product.created_at,
                 'rating'       :product.avg_rating, 
-                'review'       :{
-                    'id'         :review.user.id,
-                    'username'   :review.user.firstname + review.user.lastname,
-                    'created_at' :review.content,
-                    'rating'     :review.rating.score
-                } if not review else None
+                'review'       :review
             })
             return JsonResponse({"result":result}, status=200)
         except KeyError:
