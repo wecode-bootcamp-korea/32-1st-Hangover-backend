@@ -1,6 +1,15 @@
+import json
+
+from django.views    import View
+from django.http     import JsonResponse
+
+from core.utils     import login_decorator
+from reviews.models  import Review, ReviewLike
+
+class ReviewView(View):
     def get(self, request):
         data = json.loads(request.body)
-        
+
         product_id = data.get('product_id')
         reviews = Review.objects.filter(id=product_id).all()
 
