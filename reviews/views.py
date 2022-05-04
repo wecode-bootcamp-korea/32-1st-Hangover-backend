@@ -19,9 +19,6 @@ class ReviewView(View):
             content    = data['content']
             rating     = data['rating']
 
-            if not (rating or content):
-                return JsonResponse({'message': 'KEY_ERROR'}, status=400)
-
             review = Review.objects.create(
                 user       = user,
                 product_id = product_id,
