@@ -96,13 +96,10 @@ class ProductListView(View):
                     'rating'     :review.rating.score
                 } if not review == None else None
             })
-            
-            print("result :",result)
+
+            #FIXME: 쿼리개수가 12개 미만일때 에러가 발생함
             all_page,_ = divmod(len(products_list),limit)
             result = result[page*limit-1:] if page == all_page else result[(page-1)*limit:page*limit]
-            #여기서 에러발생
-            print("result :",result)
-            
 
             return JsonResponse({"current_page":page,"all_page":all_page,"result":result}, status=200)
 
