@@ -1,7 +1,7 @@
 import json
 
-from django.views    import View
-from django.http     import JsonResponse
+from django.views import View
+from django.http  import JsonResponse
 
 from core.utils     import login_decorator
 from reviews.models import Review
