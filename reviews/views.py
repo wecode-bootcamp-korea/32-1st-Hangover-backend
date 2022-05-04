@@ -4,7 +4,7 @@ from django.views    import View
 from django.http     import JsonResponse
 
 from core.utils      import login_decorator
-from reviews.models  import Review, ReviewLike
+from reviews.models  import Review
 
 class ReviewLikeView(View):
     @login_decorator
@@ -25,8 +25,6 @@ class ReviewLikeView(View):
 
         if ReviewLike.objects.filter(user_id=user_id, review_id=review_id):
             ReviewLike.objects.filter(user_id=user_id, review_id=review_id).delete()
-            
-            return JsonResponse({'message': 'LIKE_CANCELLED'}, status=200)
         
         else:
             ReviewLike.objects.create(user_id=user_id, review_id=review_id)
