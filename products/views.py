@@ -18,6 +18,7 @@ class ProductDetailView(View):
                 'country'            : product.country.origin,
                 'alcohol_percentage' : product.alcohol_percentage,
                 'food_category'      : [food.food_category for food in product.food_category.all()],
+                'image_url'          : product.imageurl_set.first().image_url,
                 'property'           : product.property,
                 'reviews'            : product.reviews.all().count(),
                 'ave_rating'         : product.avg_rating
