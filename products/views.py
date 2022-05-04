@@ -10,6 +10,33 @@ from reviews.models   import Review
 
 class ProductListView(View):
     def get(self,request):
+
+        """
+        ProductListView-GET : 조건에 맞는 상품 리스트를 반환
+
+        Pagination
+        page  : 현재 페이지
+        limit : 페이지당 상품의 개수를 반환
+
+        필터KEY
+        rating       : 입력된 평점. 평점이상의 상품을 반환
+        price        : 입력된 가격. 가격이상의 상품을 반환
+        category     : 주종 ex) wine, whisky
+        country      : 원산지가 되는 국가 ex)korean
+        food_pairing : 잘 어울리는 음식 ex) korean, western
+        sorting      : 정렬방식
+
+        정렬 방식의 종류
+        sorting_dict = {
+                "high_price"    : 높은 가격 순
+                "low_price"     : 낮은 가격 순
+                "high_rating"   : 높은 평점 순
+                "low_rating"    : 낮은 평점 순
+                "many_review"   : 많은 리뷰 순
+                "little_review" : 적은 리뷰 순
+                "random"        : 랜덤정렬
+            }
+        """
         
         try:
             page         = int(request.GET.get('page',1))
