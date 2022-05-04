@@ -1,5 +1,3 @@
-import random
-
 from django.db.models import Avg, Q
 from django.http      import JsonResponse
 from django.views     import View
@@ -7,6 +5,12 @@ from django.views     import View
 from products.models  import Product, Category, Country, FoodPairing
 
 class ProductSearchView(View):
+
+    """
+    1. 검색어가 필터의 카테고리에 포함될 경우, 해당 카테고리에 속한 상품 리스트를 반환 
+    2. 검색어가 상품명에 포함되는 상품 리스트를 반환 
+    3. 일치되는 상품이 없을 경우, 추천검색어를 반환
+    """
     def get(self,request):
 
         search = request.GET.get('search')
@@ -32,6 +36,7 @@ class ProductSearchView(View):
                 'Foodpairing'     : Q(productfoodpairing__foodpairing__food_category=matched_keyword),
             }
             products_list = products_list.filter(Q_filter[filter])
+
         else:
             products_list          = products_list.filter(name__icontains=search)
             filter,matched_keyword = None,None
@@ -47,18 +52,16 @@ class ProductSearchView(View):
                 'created_at'   :product.created_at,
                 'rating'       :product.avg_rating, 
             } for product in products_list][:limit]
-
             return JsonResponse({"response":[{"filter":filter,"matched_keyword":matched_keyword,"result":result}]}, status=200)
 
         else:
             message = "no_searched_products"
             recommended_words = {
-                "Category"    : random.choice(Category.objects.all().values_list('name', flat = True)),
-                "Country"     : random.choice(Country.objects.all().values_list('origin', flat = True)),
-                "Foodpairing" : random.choice(FoodPairing.objects.all().values_list('food_category', flat = True))
+                "Category"    : Category.objects.all().values_list('name', flat = True).order_by('?').first(),
+                "Country"     : Country.objects.all().values_list('origin', flat = True).order_by('?').first(),
+                "Foodpairing" : FoodPairing.objects.all().values_list('food_category', flat = True).order_by('?').first()
                 }
             return JsonResponse({"response":[message,recommended_words]}, status=200)
-
 
 class ProductDetailView(View):
     def get(self, request, product_id):
