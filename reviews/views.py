@@ -4,7 +4,7 @@ from django.views    import View
 from django.http     import JsonResponse
 
 from core.utils     import login_decorator
-from reviews.models  import Review, ReviewLike
+from reviews.models  import Review
 
 class ReviewView(View):
 
@@ -15,7 +15,7 @@ class ReviewView(View):
             data       = json.loads(request.body)
 
             user       = request.user
-            product_id    = data['product_id']
+            product_id = data['product_id']
             content    = data['content']
             rating     = data['rating']
 
