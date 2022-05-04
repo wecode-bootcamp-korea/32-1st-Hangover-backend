@@ -5,6 +5,8 @@ from django.http  import JsonResponse
 
 from core.utils     import login_decorator
 from reviews.models import Review
+from products.models import Product
+from users.models import User
 
 class ReviewView(View):
     @login_decorator
@@ -31,7 +33,10 @@ class ReviewView(View):
     def get(self, request):
         try:
             product_id = request.GET.get('product_id')
-            reviews = Review.objects.filter(id=product_id)
+            if not Product.objects.filter(id=product_id).exists():
+                return JsonResponse({"message": "PRODUCT_DOES_NOT_EXIST"}, status=404)
+
+            reviews = Review.objects.filter(product_id=product_id)
 
             review_list = [{
                 "firstname"  : review.user.firstname,
@@ -72,19 +77,13 @@ class ReviewView(View):
 
     @login_decorator
     def delete(self, request):
-        try:
-            review_id = request.GET.get('review_id')
+        user_id = request.user.id
+        review_id = request.GET.get('review_id')
+        product_id = request.GET.get('product_id')
 
-            review = Review.objects.get(id = review_id)
-
-            if request.user.id != review.user.id:
-                return JsonResponse({'message': 'INVALID_USER'}, status=401)
-                
-            review.delete()
-            return JsonResponse({"message": "Review was deleted"}, status = 204)
+        if not Review.objects.filter(id=review_id, product_id=product_id, user_id=user_id).exists():
+            return JsonResponse({'message':'REVIEW_DOES_NOT_EXIST'}, status=404)
         
-        except Review.DoesNotExist:
-            return JsonResponse({"message" : "INVALID_REVIEW"}, status=401)
-
-        except KeyError:
-            return JsonResponse({"message": "KEY_ERROR"}, status=400)
+        Review.objects.filter(id=review_id, product_id=product_id, user_id=user_id).first().delete()
+        
+        return JsonResponse({"message": "Review was deleted"}, status = 204)
