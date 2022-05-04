@@ -36,7 +36,6 @@ class ReviewView(View):
                 return JsonResponse({"message": "PRODUCT_DOES_NOT_EXIST"}, status=404)
 
             reviews = Review.objects.filter(product_id=product_id)
-            print(reviews)
 
             review_list = [{
                 "firstname"  : review.user.firstname,
