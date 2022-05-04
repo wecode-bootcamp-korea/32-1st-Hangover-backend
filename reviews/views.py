@@ -10,16 +10,15 @@ class ReviewView(View):
     @login_decorator
     def delete(self, request):
         try:
-            data = json.loads(request.body)
-            review_id = data['review_id']
+            review_id = request.GET.get('review_id')
 
-            review = Review.objects.get(
-                id = review_id
-            )
-            if request.user.id == review.user.id:
-                review.delete()
+            review = Review.objects.get(id = review_id)
 
-            return JsonResponse({"message": "Review was deleted"}, status = 200)
+            if not request.user.id == review.user.id:
+                return JsonResponse({"message": "FORBIDDEN"}, status = 403)
+                
+            review.delete()
+            return JsonResponse({"message": "Review was deleted"}, status = 204)
         
         except Review.DoesNotExist:
             return JsonResponse({"message" : "INVALID_REVIEW"}, status=401)
