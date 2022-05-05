@@ -4,14 +4,14 @@ from django.views     import View
 
 from products.models  import Product, Category, Country, FoodPairing
 
-class ProductSearchView(View):
 
+
+class ProductSearchView(View):
     """
     1. 검색어가 필터의 카테고리에 포함될 경우, 해당 카테고리에 속한 상품 리스트를 반환 
     2. 검색어가 상품명에 포함되는 상품 리스트를 반환 
     3. 일치되는 상품이 없을 경우, 추천검색어를 반환
     """
-
     def get(self,request):
 
         search = request.GET.get('search')
@@ -68,6 +68,8 @@ class ProductSearchView(View):
                 "Foodpairing" : FoodPairing.objects.all().values_list('food_category', flat = True).first()
                 }
             return JsonResponse({"response":[message,recommended_words]}, status=200)
+
+
 
 class ProductDetailView(View):
     def get(self, request, product_id):

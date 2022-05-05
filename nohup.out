@@ -1,0 +1,24 @@
+[2022-05-05 01:37:33 +0900] [6232] [INFO] Starting gunicorn 20.1.0
+[2022-05-05 01:37:33 +0900] [6232] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2022-05-05 01:37:33 +0900] [6232] [ERROR] Retrying in 1 second.
+[2022-05-05 01:37:34 +0900] [6232] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2022-05-05 01:37:34 +0900] [6232] [ERROR] Retrying in 1 second.
+[2022-05-05 01:37:35 +0900] [6232] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2022-05-05 01:37:35 +0900] [6232] [ERROR] Retrying in 1 second.
+[2022-05-05 01:37:36 +0900] [6232] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2022-05-05 01:37:36 +0900] [6232] [ERROR] Retrying in 1 second.
+[2022-05-05 01:37:36 +0900] [6277] [INFO] Starting gunicorn 20.1.0
+[2022-05-05 01:37:36 +0900] [6277] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2022-05-05 01:37:36 +0900] [6277] [ERROR] Retrying in 1 second.
+[2022-05-05 01:37:37 +0900] [6232] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2022-05-05 01:37:37 +0900] [6232] [ERROR] Retrying in 1 second.
+[2022-05-05 01:37:37 +0900] [6277] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2022-05-05 01:37:37 +0900] [6277] [ERROR] Retrying in 1 second.
+[2022-05-05 01:37:38 +0900] [6232] [ERROR] Can't connect to ('0.0.0.0', 8000)
+[2022-05-05 01:37:38 +0900] [6277] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2022-05-05 01:37:38 +0900] [6277] [ERROR] Retrying in 1 second.
+[2022-05-05 01:37:39 +0900] [6277] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2022-05-05 01:37:39 +0900] [6277] [ERROR] Retrying in 1 second.
+[2022-05-05 01:37:40 +0900] [6277] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2022-05-05 01:37:40 +0900] [6277] [ERROR] Retrying in 1 second.
+[2022-05-05 01:37:41 +0900] [6277] [ERROR] Can't connect to ('0.0.0.0', 8000)
