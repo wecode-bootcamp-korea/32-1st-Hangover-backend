@@ -14,33 +14,45 @@ class ProductListView(View):
         """
         ProductListView-GET : 조건에 맞는 상품 리스트를 반환
 
-        Pagination
-        page  : 현재 페이지
-        limit : 페이지당 상품의 개수를 반환
+        -Pagination
+            page  : 현재 페이지. default = 1
+            limit : 페이지당 상품의 개수를 반환 default = 20
 
-        필터KEY
-        rating       : 입력된 평점. 평점이상의 상품을 반환
-        price        : 입력된 가격. 가격이상의 상품을 반환
-        category     : 주종 ex) wine, whisky
-        country      : 원산지가 되는 국가 ex)korean
-        food_pairing : 잘 어울리는 음식 ex) korean, western
-        sorting      : 정렬방식
+        -필터KEY
+            rating       : 입력된 평점. 평점이상의 상품을 반환. default = 0
+            price        : 입력된 가격. 가격이상의 상품을 반환. default = 1000000
+            category     : 주종 ex) wine, whisky 
+            country      : 원산지가 되는 국가 ex)korean
+            food_pairing : 잘 어울리는 음식 ex) korean, western
+            sorting      : 정렬방식. 기본 정렬은 높은 평점순 > 높은 가격순
 
-        정렬 방식의 종류
-        sorting_dict = {
-                "high_price"    : 높은 가격 순
-                "low_price"     : 낮은 가격 순
-                "high_rating"   : 높은 평점 순
-                "low_rating"    : 낮은 평점 순
-                "many_review"   : 많은 리뷰 순
-                "little_review" : 적은 리뷰 순
-                "random"        : 랜덤정렬
-            }
+        -정렬 방식으로 넣어줄 수 있는 값
+            sorting_dict = {
+                    "high_price"    : 높은 가격 순
+                    "low_price"     : 낮은 가격 순
+                    "high_rating"   : 높은 평점 순
+                    "low_rating"    : 낮은 평점 순
+                    "many_review"   : 많은 리뷰 순
+                    "little_review" : 적은 리뷰 순
+                    "random"        : 랜덤정렬
+                }
+
+        -반환되는 상품리스트에 포함된 정보
+            'id'           :product.id,
+            'price'        :product.price,
+            'name'         :product.name,
+            'country'      :product.country.origin,
+            'category'     :product.category.name,
+            'image_url'    :product.imageurl_set.first().image_url,
+            'created_at'   :product.created_at,
+            'rating'       :product.avg_rating, 
+            'review'       :review
+        *리뷰의 경우, 좋아요를 두개이상 받은 리뷰들 중에서 좋아요를 가장 많이 받은 리뷰정보를 반환
         """
         
         try:
             page         = int(request.GET.get('page',1))
-            limit        = int(request.GET.get('limit',12))
+            limit        = int(request.GET.get('limit',20))
             category     = request.GET.getlist('category')
             country      = request.GET.getlist('country')
             price        = int(request.GET.get('price',"100 만원이하")[:-5])*10000
@@ -76,9 +88,7 @@ class ProductListView(View):
             else:
                 q = Q() 
                 if category:
-                    print(category)
                     q &= Q(category_id__name__in=category)
-                    print(q)
                 if country:
                     q &= Q(country_id__origin__in=country)
                 if price:
@@ -96,20 +106,23 @@ class ProductListView(View):
             
             result = []
             for product in products_list[(page-1)*limit:page*limit]:
-                review = None
                 if product.reviews.exists:
                     reviewlike_dict = {
                         review.id:review.reviewlike_set.count() for review in Review.objects.filter(product_id=product.id)
                     }
-                    likemost_review_id = max(reviewlike_dict,key=reviewlike_dict.get)
 
-                    review = Review.objects.get(id=likemost_review_id)
+                    if max(reviewlike_dict.values()) < 2:
+                        review = None
+                    else:
+                        likemost_review_id = max(reviewlike_dict,key=reviewlike_dict.get)
+                        review = Review.objects.get(id=likemost_review_id)
 
-                    review = {
-                    'id'         :review.user.id,
-                    'username'   :review.user.firstname + review.user.lastname,
-                    'created_at' :review.content,
-                    'rating'     :review.rating.score
+                        review = {
+                        'id'         :review.user.id,
+                        'username'   :review.user.firstname + review.user.lastname,
+                        'created_at' :review.created_at,
+                        'content'    :review.content,
+                        'rating'     :review.rating.score
                 }
                 
                 result.append({
@@ -123,6 +136,8 @@ class ProductListView(View):
                 'rating'       :product.avg_rating, 
                 'review'       :review
             })
+
+
             return JsonResponse({"result":result}, status=200)
         except KeyError:
             return JsonResponse({"message":"KEY_ERROR"}, status=400)
