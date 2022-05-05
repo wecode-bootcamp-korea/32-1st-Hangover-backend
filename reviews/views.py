@@ -77,8 +77,8 @@ class ReviewView(View):
 
     @login_decorator
     def delete(self, request):
-        user_id = request.user.id
-        review_id = request.GET.get('review_id')
+        user_id    = request.user.id
+        review_id  = request.GET.get('review_id')
         product_id = request.GET.get('product_id')
 
         if not Review.objects.filter(id=review_id, product_id=product_id, user_id=user_id).exists():
@@ -86,4 +86,4 @@ class ReviewView(View):
         
         Review.objects.filter(id=review_id, product_id=product_id, user_id=user_id).first().delete()
         
-        return JsonResponse({"message": "Review was deleted"}, status = 204)
+        return JsonResponse({"message": "Review was deleted", "review_count": Review.objects.filter(product_id=product_id, user_id=user_id).count()}, status = 204)
