@@ -388,3 +388,6 @@ zsdoc/data
 my_settings.py
 db_uploader.py
 db_csv/
+hangover.pem
+hangover.pem:Zone.Identifier
+nohup.out
